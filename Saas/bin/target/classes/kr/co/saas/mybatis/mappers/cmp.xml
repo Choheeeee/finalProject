@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.saas.cmp.dao.cmpDAO">
+	<insert id="insertCompany" parameterType="CompanyVO">
+		INSERT INTO company (
+		    cmp_id
+		    , cmp_emp_chargerid
+		    , cmp_nm
+		    , cmp_ceo
+		    , cmp_no
+		    , cmp_addr
+		    , cmp_industry
+		    , cmp_telno
+		    , cmp_mail
+		    , cmp_status
+		    , cmp_cptl
+		) VALUES (
+		    #{cmpId,jdbcType=VARCHAR}
+			, #{cmpEmpChargerid,jdbcType=VARCHAR}
+			, #{cmpNm,jdbcType=VARCHAR}
+			, #{cmpCeo,jdbcType=VARCHAR}
+			, #{cmpNo,jdbcType=VARCHAR}
+			, #{cmpAddr,jdbcType=VARCHAR}
+			, #{cmpIndustry,jdbcType=VARCHAR}
+			, #{cmpTelno,jdbcType=VARCHAR}
+			, #{cmpMail,jdbcType=VARCHAR}
+			, '1'
+			, #{cmpCptl,jdbcType=NUMERIC}
+		)
+	</insert>
+		
+	<insert id="insertEmployee" parameterType="CompanyVO">
+		INSERT INTO EMPLOYEE(
+			EMP_NO
+    		, EMP_CMP_ID
+		    , EMP_NAME
+		    , EMP_PASS
+		    , EMP_STATUS
+		    , EMP_ROLE 
+		    , EMP_JOBPOSITION 
+		    , EMP_MOBILE
+		    , EMP_CMPTELNO
+		    , EMP_MAIL
+		    , EMP_ADDR
+		) VALUES (
+			#{cmpId,jdbcType=VARCHAR}
+			,#{cmpId,jdbcType=VARCHAR}
+			,#{cmpNm}
+			,'0000'
+			,'1'
+			, 'ROLE_ADMIN'
+			, '시스템계정'
+			,#{cmpTelno}
+			,#{cmpTelno}
+			,#{cmpMail,jdbcType=VARCHAR}
+			,#{cmpAddr,jdbcType=VARCHAR}
+		)
+	</insert>
+   <insert id="insertAdmin" parameterType="CompanyVO">
+     <selectKey order="BEFORE" resultType="string" keyProperty="admNo">
+        SELECT  
+            LPAD(NVL(TO_NUMBER(MAX(ADM_NO)), 0) + 1, 8, '0')
+        FROM ADMIN_LOG
+     </selectKey>
+        INSERT INTO ADMIN_LOG(
+           ADM_NO
+            , ADM_FROM
+            , ADM_CMP
+            , ADM_TO
+            , ADM_DAT
+        )VALUES(
+           #{admNo}
+           ,#{cmpId}
+           ,#{cmpId}
+           ,#{cmpId}
+           ,SYSDATE
+        )
+  	</insert>
+  	
+	<insert id="insertPersonnelSystem" parameterType="CompanyVO">
+	INSERT INTO personnel_system (
+	    prs_code
+	    , prs_clscd
+	    , prs_name
+	    , prs_emp_registerid
+	    , prs_registdat
+	    , prs_emp_changerid
+	    , prs_changedat
+	    , prs_useyn
+	    , prs_cmp_id    
+	) 
+	select
+	    prs_code
+	    , prs_clscd
+	    , prs_name
+	    , 'SYSTEM'
+	    , CURRENT_TIMESTAMP
+	    , 'SYSTEM'
+	    , CURRENT_TIMESTAMP
+	    , 'Y'
+	    , #{cmpId}
+	from personnel_system
+	    where prs_cmp_id = 'INIT'
+	</insert>
+	
+	<select id="check" parameterType="CompanyVO">
+		SELECT count(*)
+		FROM company
+		WHERE CMP_ID = #{cmpId}
+	</select>
+	
+	
+</mapper>
